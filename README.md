@@ -4,10 +4,21 @@
 基于“通义千问”,Flask,实现AI依据提前配置的考试重点进行提问,用户进行回答,AI给出评分
 
 ## 使用说明
+首先需要有python环境
+
+下载所需库(这里可以使用虚拟环境,如果不会也可以直接下在本地)
+
+```shell
+pip install -r requirements.txt
+```
 
 配置config.json中的内容
 
 运行app.py
+
+```shell
+python app.py
+```
 
 本地访问http://localhost:7000/
 或者局域网访问7000端口(端口可以自行设置)
