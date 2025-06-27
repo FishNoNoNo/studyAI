@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI学习助手</title>
+    <style>
+        :root {
+            --primary-color: #4e54c8;
+            --secondary-color: #8f94fb;
+            --accent-color: #6a11cb;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa, #e4edf5);
+            color: var(--dark-color);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .content-section {
+            padding: 25px;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            font-size: 1.6rem;
+        }
+
+        .question-container {
+            background-color: var(--light-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #333;
+            line-height: 1.7;
+        }
+
+        .answer-container {
+            margin-top: 20px;
+        }
+
+        .answer-textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        .answer-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.1);
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        #output {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 150px;
+            white-space: pre-wrap;
+            font-size: 1rem;
+            line-height: 1.7;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .evaluation-container {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f0f8ff;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .evaluation-title {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .scores {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .score-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .score-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .feedback {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            line-height: 1.7;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(78, 84, 200, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-graduation-cap"></i> AI学习助手</h1>
+            <p>基于教材的智能问答系统 - 提出问题，评估答案，巩固知识</p>
+        </header>
+
+        <div class="content-section">
+            <h2 class="section-title"><i class="fas fa-question-circle"></i> 学习问答</h2>
+
+            <div class="question-container">
+                <div class="question-text" id="questionText">
+                    点击"获取问题"按钮开始学习，AI将根据教材内容提出问题。
+                </div>
+
+                <div class="answer-container">
+                    <textarea class="answer-textarea" id="answerInput" placeholder="在此输入您的回答..."></textarea>
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="getQuestion()" id="getQuestionBtn">
+                        <i class="fas fa-lightbulb"></i> 获取问题
+                    </button>
+                    <button class="btn btn-outline" onclick="evaluateAnswer()" id="evaluateBtn" disabled>
+                        <i class="fas fa-check-circle"></i> 提交评估
+                    </button>
+                    <button class="btn btn-danger" onclick="clearAll()">
+                        <i class="fas fa-redo"></i> 重新开始
+                    </button>
+                </div>
+
+                <div id="output"></div>
+            </div>
+
+            <div class="evaluation-container" id="evaluationContainer" style="display: none;">
+                <h3 class="evaluation-title"><i class="fas fa-chart-line"></i> 评估结果</h3>
+
+                <div class="scores" id="scoresContainer">
+                    <!-- 评分卡片将通过JS动态添加 -->
+                </div>
+
+                <div class="feedback" id="feedback">
+                    <!-- 反馈内容将通过JS动态添加 -->
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>AI政治理论学习助手 © 2023 | 基于AI的知识评估系统 | 让理论学习更高效</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM元素
+        const questionText = document.getElementById('questionText');
+        const answerInput = document.getElementById('answerInput');
+        const outputElement = document.getElementById('output');
+        const getQuestionBtn = document.getElementById('getQuestionBtn');
+        const evaluateBtn = document.getElementById('evaluateBtn');
+        const evaluationContainer = document.getElementById('evaluationContainer');
+        const scoresContainer = document.getElementById('scoresContainer');
+        const feedbackElement = document.getElementById('feedback');
+
+        // 当前问题
+        let currentQuestion = "";
+
+        // 获取问题
+        function getQuestion() {
+            // 重置状态
+            currentQuestion='';
+            outputElement.textContent = '';
+            evaluationContainer.style.display = 'none';
+            answerInput.value = '';
+            evaluateBtn.disabled = true;
+
+            // 显示加载状态
+            outputElement.textContent = 'AI正在思考问题...';
+
+            // 创建EventSource连接
+            const eventSource = new EventSource('/get_question');
+
+            eventSource.onmessage = function (event) {
+                // 追加问题内容
+                outputElement.textContent += event.data;
+                currentQuestion += event.data;
+
+                // 滚动到底部
+                outputElement.scrollTop = outputElement.scrollHeight;
+            };
+
+            eventSource.onerror = function (error) {
+                console.error('EventSource error:', error);
+                eventSource.close();
+
+                // 更新问题文本
+                questionText.textContent = currentQuestion;
+
+                // 启用评估按钮
+                evaluateBtn.disabled = false;
+
+                // 移除加载状态
+                if (outputElement.textContent === 'AI正在思考问题...') {
+                    outputElement.textContent = '';
+                }
+            };
+        }
+
+        // 评估答案
+        function evaluateAnswer() {
+            const answer = answerInput.value.trim();
+
+            if (!answer) {
+                alert('请输入您的回答后再提交评估！');
+                return;
+            }
+
+            // 显示加载状态
+            outputElement.textContent = 'AI正在评估您的回答...';
+            evaluationContainer.style.display = 'none';
+
+            // 发送评估请求
+            fetch('/evaluate_answer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    question: currentQuestion,
+                    answer: answer
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // 处理评估结果
+
+                    const jsonData = JSON.parse(data);
+                    displayEvaluation(jsonData);
+                })
+                .catch(error => {
+                    console.error('评估错误:', error);
+                    outputElement.textContent = '评估失败，请重试: ' + error.message;
+                });
+        }
+
+        // 显示评估结果
+        function displayEvaluation(data) {
+            // 清空输出区域
+            outputElement.textContent = '';
+
+            // 显示评估容器
+            evaluationContainer.style.display = 'block';
+
+            // 处理评分数据
+            if (data.error) {
+                feedbackElement.textContent = '评估错误: ' + data.error;
+                return;
+            }
+
+            // 解析评分
+            const scores = {
+                accuracy: data.accuracy_score,
+                completeness: data.completeness_score,
+                clarity: data.clarity_score,
+                overall: data.overall_score
+            };
+
+            // 添加评分卡片
+            scoresContainer.innerHTML = `
+                <div class="score-card">
+                    <div class="score-label">准确性</div>
+                    <div class="score-value">${scores.accuracy}</div>
+                </div>
+                <div class="score-card">
+                    <div class="score-label">完整性</div>
+                    <div class="score-value">${scores.completeness}</div>
+                </div>
+                <div class="score-card">
+                    <div class="score-label">清晰度</div>
+                    <div class="score-value">${scores.clarity}</div>
+                </div>
+                <div class="score-card">
+                    <div class="score-label">总分</div>
+                    <div class="score-value">${scores.overall}/10</div>
+                </div>
+            `;
+
+            // 添加反馈
+            feedbackElement.innerHTML = `<strong>反馈建议：</strong><br>${data.feedback|| '无反馈信息'}`;
+        }
+
+        // 清除所有内容
+        function clearAll() {
+            currentQuestion = "";
+            questionText.textContent = "点击'获取问题'按钮开始学习，AI将根据教材内容提出问题。";
+            answerInput.value = "";
+            outputElement.textContent = "";
+            evaluationContainer.style.display = "none";
+            evaluateBtn.disabled = true;
+        }
+
+        // 监听答案输入
+        answerInput.addEventListener('input', function () {
+            if (answerInput.value.trim() && currentQuestion) {
+                evaluateBtn.disabled = false;
+            } else {
+                evaluateBtn.disabled = true;
+            }
+        });
+    </script>
+</body>
+
+</html>
