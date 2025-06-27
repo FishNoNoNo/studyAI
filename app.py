@@ -1,6 +1,6 @@
 """
 @Author:         FishNoNoNo
-@Version:        1.0.0
+@Version:        1.0.1
 @Date:           2025-06-27
 """
 
@@ -8,6 +8,7 @@ from openai import OpenAI
 import time
 from flask import Flask, Response, jsonify, render_template, request
 import json
+import random
 
 # 读取配置
 
@@ -24,11 +25,7 @@ client = OpenAI(
     base_url=config['model']['base_url'],
 )
 
-book_content = ",".join(config["book_content"])
-
-content=f"你是一个老师,你需要依据{book_content}向我提问,我会进行回答,然后你需要对我的回答进行评分."
-
-system_message = {"role": "system", "content": content}
+book_content = config["book_content"]
 
 @app.route("/")
 def home():
@@ -39,6 +36,12 @@ def home():
 def get_question():
     # 从查询参数获取消息
     user_message = request.args.get("message", "请根据教材内容提出一个问题")
+
+    random_num=random.randint(0,len(book_content))
+
+    content=f"你是一个老师,你需要依据{book_content[random_num]}向我提问,我会进行回答,然后你需要对我的回答进行评分."
+
+    system_message = {"role": "system", "content": content}
 
     def event_generator():
         completion = client.chat.completions.create(
@@ -53,6 +56,7 @@ def get_question():
         for chunk in completion:
             content = chunk.choices[0].delta.content
             if content:
+                content = content.replace("\n", "").replace("*", "")
                 # 正确构建 SSE 格式: data: <content>\n\n
                 yield f"data: {content}\n\n"
             time.sleep(0.1)
